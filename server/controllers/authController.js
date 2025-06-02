@@ -1,7 +1,10 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
 import User from '../models/User.js';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from '../utils/tokenHelper.js';
 
 export const register = async (req, res) => {
   try {
@@ -78,14 +81,8 @@ export const login = async (req, res) => {
     }
 
     // generate access token
-    const accessToken = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '5m' }
-    );
-
-    // generate refresh token
-    const refreshToken = crypto.randomBytes(64).toString('hex');
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
     const { password: _, ...userWithoutPassword } = user.toObject();
 
@@ -111,10 +108,37 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
-  res.status(200).json({ message: 'ok' });
+export const logout = async (req, res) => {
+  res.clearCookie('refreshToken');
+  res.status(200).json({ message: 'Logged out' });
 };
 
-export const getMe = (req, res) => {
-  res.status(200).json({ message: 'ok' });
+export const refreshAccessToken = (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token) {
+    return res.status(401).json({ message: 'Refresh token is missing' });
+  }
+
+  try {
+    const decoded = verifyRefreshToken(token);
+    const accessToken = generateAccessToken({
+      _id: decoded.userId,
+      role: decoded.role,
+    });
+    res.json({ accessToken });
+  } catch (error) {
+    res.status(403).json({
+      message: 'Invalid refresh token',
+    });
+  }
+};
+
+export const getMe = async (req, res) => {
+  const user = await User.findById(req.user.userId).select('-password');
+  if (!user) {
+    return res.status(404).json({
+      message: 'User not found',
+    });
+  }
+  res.status(200).json(user);
 };
