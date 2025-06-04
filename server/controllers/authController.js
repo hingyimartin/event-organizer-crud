@@ -61,9 +61,17 @@ export const login = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({
-      $or: [username ? { username } : null, email ? { email } : null],
-    }).select('+password');
+    const query = [];
+    if (username) query.push({ username });
+    if (email) query.push({ email });
+
+    if (query.length === 0) {
+      return res.status(400).json({
+        message: 'Username or email required',
+      });
+    }
+
+    const user = await User.findOne({ $or: query }).select('+password');
 
     // check user
     if (!user) {
