@@ -8,15 +8,17 @@ const Navbar = ({ login, register }) => {
     logout(navigate);
   };
   return (
-    <div className='w-full flex items-center justify-between max-w-4xl p-6'>
-      <Link to='/'>hmdev EO</Link>
+    <div className='w-full flex items-center justify-between border-b p-6'>
+      <Link to='/'>hmdev</Link>
       <div className='flex items-center gap-4'>
         <Link to='/'>Home</Link>
-        <Link to='/'>About</Link>
       </div>
       <div>
         {user ? (
           <div className='flex items-center gap-4'>
+            {user.role === 'admin' && (
+              <Link to='/event-management'>Event management</Link>
+            )}
             <Link to='/me'>Profile</Link>
             <button onClick={handleLogout}>Logout</button>
           </div>

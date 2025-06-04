@@ -45,7 +45,7 @@ const Login = ({ open, close }) => {
       onSubmit={submitForm}
       className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'
     >
-      <div className='bg-white p-6 rounded-2xl shadow-2xl w-full max-w-sm'>
+      <div className='bg-white p-6 rounded-2xl shadow-2xl w-[50%]'>
         <h2 className='text-2xl font-semibold mb-4 text-center'>
           Bejelentkezés
         </h2>
@@ -55,6 +55,7 @@ const Login = ({ open, close }) => {
           placeholder='Email'
           name='email'
           onChange={formDataChaneHandler}
+          value={formData.email}
           className='w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
         />
         <input
@@ -62,6 +63,7 @@ const Login = ({ open, close }) => {
           placeholder='Password'
           name='password'
           onChange={formDataChaneHandler}
+          value={formData.password}
           className='w-full mb-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
         />
         <Message type={message.type} message={message.message} />
